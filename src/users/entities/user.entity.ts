@@ -1,6 +1,7 @@
 /* eslint-disable prettier/prettier */
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Role } from '../enums/role.enum';
+import { Blog } from 'src/blog/entities/blog.entity';
 
 @Entity('User', { schema: 'public' })
 export class User {
@@ -25,4 +26,7 @@ export class User {
     default: Role.READER,
   })
   role: Role;
+
+  @OneToMany(() => Blog, (blog) => blog.user, { cascade: true })
+  blogs: Blog[];
 }
