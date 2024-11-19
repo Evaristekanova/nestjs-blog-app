@@ -1,20 +1,26 @@
+/* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-// import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './users/users.module';
+import { CategoryModule } from './category/category.module';
 
 @Module({
   imports: [
-    // TypeOrmModule.forRoot({
-    //   type: 'postgres',
-    //   host: process.env.DATABASE_HOST,
-    //   port: parseInt(process.env.DATABASE_PORT, 10),
-    //   username: process.env.DATABASE_USERNAME,
-    //   password: `${process.env.DATABASE_PASSWORD}`,
-    //   database: process.env.DATABASE_NAME,
-    //   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
-    //   synchronize: true,
-    // }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: `${process.env.DB_HOST}`,
+      port: parseInt(process.env.DB_PORT, 10),
+      username: `${process.env.POSTGRES_USER}`,
+      password: `${process.env.POSTGRES_PASSWORD}`,
+      database: `${process.env.POSTGRES_DB}`,
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      autoLoadEntities: true,
+      synchronize: true,
+    }),
+    UsersModule,
+    CategoryModule,
   ],
   controllers: [AppController],
   providers: [AppService],
