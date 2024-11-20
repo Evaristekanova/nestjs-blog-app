@@ -14,14 +14,25 @@ export class BlogService {
     private readonly blogRepository: Repository<Blog>,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Blog)
+    private readonly categoryRepository: Repository<Blog>,
   ) {}
 
   // Create a new blog
   async create(createBlogDto: CreateBlogDto, userId: number): Promise<Blog> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
-    if (!user) {
-      throw new NotFoundException(`User with ID ${userId} not found`);
-    }
+    console.log('user here', user);
+    if (!user) throw new NotFoundException(`User with not found`);
+
+    const { categoryId } = createBlogDto;
+    console.log('categoryId', categoryId);
+    const category = await this.categoryRepository.findOne({
+      where: { id: categoryId },
+    });
+
+    console.log('category', category);
+
+    if (!category) throw new NotFoundException('Category not found');
 
     const blog = this.blogRepository.create({ ...createBlogDto, user });
     return await this.blogRepository.save(blog);
@@ -44,7 +55,6 @@ export class BlogService {
     return blog;
   }
 
-  // Update a blog by ID
   async update(id: number, updateBlogDto: UpdateBlogDto): Promise<Blog> {
     const blog = await this.blogRepository.findOne({ where: { id } });
     if (!blog) {

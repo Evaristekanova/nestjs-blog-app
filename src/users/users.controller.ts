@@ -7,13 +7,13 @@ import {
   Patch,
   Param,
   Delete,
-  HttpCode,
-  HttpStatus,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-
+import { AuthGuard } from 'src/auth/auth.guard';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -39,19 +39,10 @@ export class UsersController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
-  }
-
-  @Post('login')
-  @HttpCode(HttpStatus.OK)
-  async login(@Body() loginUserDto: CreateUserDto): Promise<object> {
-    const jwt = await this.usersService.login(loginUserDto);
-
-    return {
-      access_token: jwt,
-      token_type: 'JWT',
-      expires_in: 10000,
-    };
+  @UseGuards(AuthGuard)
+  async remove(@Param('id') id: string, @Req() req) {
+    const user = await this.usersService.findOne(id);
+    if (user.id == req.user.id) return this.usersService.remove(id);
+    return { message: 'You are not authorized to perform this action' };
   }
 }

@@ -1,26 +1,23 @@
 /* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from 'src/users/entities/user.entity';
 import { JwtModule } from '@nestjs/jwt';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { AuthService } from './service/auth.service';
-import { JwtStrategy } from './strategy/jwt.strategy';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-    }),
-    JwtModule.registerAsync({
-      imports: [ConfigModule],
-      inject: [ConfigService],
-      useFactory: async (configService: ConfigService) => ({
-        secret: configService.get('JWT_SECRET'),
-        signOptions: { expiresIn: '10000s' },
-      }),
+    TypeOrmModule.forFeature([User]),
+    ConfigModule.forRoot(),
+    JwtModule.register({
+      global: true,
+      secret: process.env.JWT_SECRET,
+      signOptions: { expiresIn: '1h' },
     }),
   ],
-  providers: [AuthService, JwtStrategy, JwtAuthGuard],
-  exports: [AuthService],
+  controllers: [AuthController],
+  providers: [AuthService],
 })
 export class AuthModule {}

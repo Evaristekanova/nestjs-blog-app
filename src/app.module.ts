@@ -12,11 +12,11 @@ import { BlogModule } from './blog/blog.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: 'db',
-      port: 5432,
-      username: 'postgres',
-      password: 'evariste44403',
-      database: 'nestjsblog',
+      host: `${process.env.DB_HOST}`,
+      port: parseInt(process.env.DB_PORT, 10),
+      username: `${process.env.POSTGRES_USER}`,
+      password: `${process.env.POSTGRES_PASSWORD}`,
+      database: `${process.env.POSTGRES_DB}`,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       autoLoadEntities: true,
       synchronize: true,

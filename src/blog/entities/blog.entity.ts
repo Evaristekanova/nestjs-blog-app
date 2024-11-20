@@ -1,6 +1,13 @@
 /* eslint-disable prettier/prettier */
+import { Category } from 'src/category/entities/category.entity';
 import { User } from 'src/users/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('Blog', { schema: 'public' })
 export class Blog {
@@ -14,5 +21,24 @@ export class Blog {
   content: string;
 
   @ManyToOne(() => User, (user) => user.blogs, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'userId' })
   user: User;
+
+  @Column('timestamp with time zone', {
+    name: 'created_at',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  createdAt: Date;
+
+  @Column('timestamp with time zone', {
+    name: 'updated_at',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
+
+  @ManyToOne(() => Category, (category) => category.blogs, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'categoryId' })
+  category: Category;
 }
