@@ -21,16 +21,12 @@ export class BlogService {
   // Create a new blog
   async create(createBlogDto: CreateBlogDto, userId: number): Promise<Blog> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
-    console.log('user here', user);
     if (!user) throw new NotFoundException(`User with not found`);
 
     const { categoryId } = createBlogDto;
-    console.log('categoryId', categoryId);
     const category = await this.categoryRepository.findOne({
       where: { id: categoryId },
     });
-
-    console.log('category', category);
 
     if (!category) throw new NotFoundException('Category not found');
 
@@ -40,17 +36,19 @@ export class BlogService {
 
   // Get all blogs
   async findAll(): Promise<Blog[]> {
-    return await this.blogRepository.find({ relations: ['user'] });
+    return await this.blogRepository.find({
+      relations: ['user'],
+    });
   }
 
   // Get a single blog by ID
   async findOne(id: number): Promise<Blog> {
     const blog = await this.blogRepository.findOne({
       where: { id },
-      relations: ['user'],
+      relations: ['user', 'comments', 'comments.user'],
     });
     if (!blog) {
-      throw new NotFoundException(`Blog with ID ${id} not found`);
+      throw new NotFoundException(`Blog not found`);
     }
     return blog;
   }
@@ -58,7 +56,7 @@ export class BlogService {
   async update(id: number, updateBlogDto: UpdateBlogDto): Promise<Blog> {
     const blog = await this.blogRepository.findOne({ where: { id } });
     if (!blog) {
-      throw new NotFoundException(`Blog with ID ${id} not found`);
+      throw new NotFoundException(`Blog not found`);
     }
 
     Object.assign(blog, updateBlogDto);
@@ -69,7 +67,7 @@ export class BlogService {
   async remove(id: number): Promise<void> {
     const blog = await this.blogRepository.findOne({ where: { id } });
     if (!blog) {
-      throw new NotFoundException(`Blog with ID ${id} not found`);
+      throw new NotFoundException(`Blog not found`);
     }
 
     await this.blogRepository.remove(blog);

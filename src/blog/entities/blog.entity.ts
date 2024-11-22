@@ -1,11 +1,13 @@
 /* eslint-disable prettier/prettier */
 import { Category } from 'src/category/entities/category.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Comment } from 'src/comments/entities/comment.entity';
 import {
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -41,4 +43,7 @@ export class Blog {
   })
   @JoinColumn({ name: 'categoryId' })
   category: Category;
+
+  @OneToMany(() => Comment, (comment) => comment.blog, { cascade: true })
+  comments: Comment[];
 }

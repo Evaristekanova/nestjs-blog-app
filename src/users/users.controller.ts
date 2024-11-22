@@ -24,7 +24,11 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
+  @UseGuards(AuthGuard)
+  findAll(@Req() req) {
+    if (req.user.role != 'writer')
+      return { message: 'You are not authorized to perform this action' };
+
     return this.usersService.findAll();
   }
 
